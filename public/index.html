@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memuat...</title>
     <style>
-        /* Tetap pertahankan background hitam sesuai keinginan Anda */
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #000000; color: #888; text-align: center; }
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f9f9f9; color: #555; text-align: center; }
     </style>
 </head>
 <body>
@@ -26,7 +25,6 @@
             }
 
             try {
-                // Link CSV publik dari Google Sheets Anda yang sudah terbukti lancar
                 const csvUrl = 'https://docs.google.com/spreadsheets/d/1EVqMj-V9Y6r0fclk7tYVQB8Co9fQ1JEmsAhcTXXGVM/export?format=csv';
                 
                 const response = await fetch(csvUrl);

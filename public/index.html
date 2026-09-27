@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memuat...</title>
+    
+    <!-- Skrip Analitik Vercel untuk memantau kunjungan umum -->
+    <script defer src="/_vercel/insights/script.js"></script>
+
     <style>
         body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #000000; color: #888; text-align: center; }
     </style>
@@ -25,33 +29,59 @@
             }
 
             try {
-                // Perbaikan: ditambahkan '?id=' sebelum menyambungkan subId
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUONX4xGdg_d4A7BJfEoYmN5k2VWtQP-zlLdq2ukWVPzUPeaAPBUEoxxypXeR6CEhA/exec?id=' + encodeURIComponent(subId);
+                // Menggunakan kembali link CSV Google Sheets yang stabil
+                const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQty5Cfk38iLp1fHwLWMUk9Leri1EJcppHrfRmhCvxtWbysft4jMvaVhOB4K_YxZV3zDKBI6_7pqlcZ/pub?gid=0&single=true&output=csv';
                 
-                const response = await fetch(scriptUrl);
-                const data = await response.json();
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
 
-                if (data.status === "error") {
-                    document.getElementById('status').innerText = data.message || 'ID tidak ditemukan.';
+                const lines = csvText.trim().split('\n');
+                
+                if (lines.length < 2) {
+                    document.getElementById('status').innerText = 'Database kosong.';
                     return;
                 }
 
-                if (data.status && data.status.toLowerCase() !== 'active') {
+                let matchedRow = null;
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (!line) continue;
+                    
+                    const cols = line.split(',').map(val => val.trim().replace(/^["']|["']$/g, ''));
+                    const rowId = cols[0];
+
+                    if (rowId && rowId.toLowerCase() === subId.trim().toLowerCase()) {
+                        matchedRow = cols;
+                        break;
+                    }
+                }
+
+                if (!matchedRow) {
+                    document.getElementById('status').innerText = `ID "${subId}" tidak ditemukan.`;
+                    return;
+                }
+
+                const gmaps_url = matchedRow[2];
+                const image_url = matchedRow[3];
+                const status = matchedRow[4];
+                const kategori = matchedRow[5];
+
+                if (status && status.toLowerCase() !== 'active') {
                     document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
                     return;
                 }
 
-                if (data.kategori && data.kategori.toLowerCase() === 'bisnis') {
-                    window.location.replace(data.gmaps_url);
+                if (kategori && kategori.toLowerCase() === 'bisnis') {
+                    window.location.replace(gmaps_url);
                 } else {
-                    const encodedTarget = encodeURIComponent(data.gmaps_url);
-                    const encodedImage = encodeURIComponent(data.image_url || '');
+                    const encodedTarget = encodeURIComponent(gmaps_url);
+                    const encodedImage = encodeURIComponent(image_url || '');
                     window.location.replace(`/sponsor.html?target=${encodedTarget}&img=${encodedImage}`);
                 }
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('status').innerText = 'Terjadi kesalahan saat memuat data.';
+                document.getElementById('status').innerText = 'Gagal memuat data.';
             }
         }
 

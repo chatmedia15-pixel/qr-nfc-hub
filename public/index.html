@@ -25,8 +25,8 @@
             }
 
             try {
-                // Masukkan Web App URL dari Google Apps Script Anda di sini
-                const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUONX4xGdg_d4A7BJfEoYmN5k2VWtQP-zlLdq2ukWVPzUPeaAPBUEoxxypXeR6CEhA/exec' + encodeURIComponent(subId);
+                // Perbaikan: ditambahkan '?id=' sebelum menyambungkan subId
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUONX4xGdg_d4A7BJfEoYmN5k2VWtQP-zlLdq2ukWVPzUPeaAPBUEoxxypXeR6CEhA/exec?id=' + encodeURIComponent(subId);
                 
                 const response = await fetch(scriptUrl);
                 const data = await response.json();

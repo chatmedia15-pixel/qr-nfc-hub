@@ -3,22 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sponsor - Menuju Google Maps</title>
+    <title>Memuat...</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f4f7f6; text-align: center; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 350px; width: 100%; }
-        img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; max-height: 180px; }
-        .timer { font-size: 28px; font-weight: bold; color: #ff5722; margin: 15px 0; }
-        button { background: #0070f3; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            background: #000000; 
+            color: #ffffff;
+            text-align: center; 
+        }
+        .container { 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        h3 {
+            font-size: 16px;
+            font-weight: normal;
+            color: #aaaaaa;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+        img { 
+            max-width: 220px; 
+            height: auto; 
+            display: block; 
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h3>Informasi Sponsor</h3>
-        <div id="banner-container"><p style="color:#888; font-size:14px;">Memuat sponsor...</p></div>
-        <p>Menuju Google Maps dalam...</p>
-        <div class="timer" id="countdown">3</div>
-        <button onclick="redirectNow()">Lewati Sekarang</button>
+    <div class="container">
+        <h3>Powered By</h3>
+        <div id="banner-container"></div>
     </div>
 
     <script>
@@ -31,50 +54,34 @@
         if (imageUrl && imageUrl !== "undefined" && imageUrl !== "null" && imageUrl.trim() !== "") {
             let cleanImgUrl = decodeURIComponent(imageUrl).trim();
             
-            // Bersihkan jika ada awalan slash ganda atau format tidak standar
             if (cleanImgUrl.startsWith('/')) {
                 cleanImgUrl = cleanImgUrl.substring(1);
             }
-
-            // Jika di spreadsheet hanya ditulis "logo.png", ubah menjadi "images/logo.png"
             if (!cleanImgUrl.startsWith('images/')) {
                 cleanImgUrl = `images/${cleanImgUrl}`;
             }
 
-            // Buat elemen gambar secara dinamis dengan penanganan error yang mencetak path aslinya
             const imgElement = document.createElement('img');
             imgElement.src = `/${cleanImgUrl}`;
-            imgElement.alt = "Sponsor Logo";
+            imgElement.alt = "Logo";
 
             imgElement.onerror = function() {
-                bannerContainer.innerHTML = `<p style="color:red; font-size:12px;">Gagal memuat: /${cleanImgUrl}</p>`;
+                bannerContainer.innerHTML = `<p style="color:red; font-size:12px;">Gagal memuat logo</p>`;
             };
 
-            bannerContainer.innerHTML = '';
             bannerContainer.appendChild(imgElement);
         } else {
-            bannerContainer.innerHTML = `<p style="color:#666; font-size:13px;">Terima kasih telah berkunjung!</p>`;
+            bannerContainer.innerHTML = `<p style="color:#666; font-size:13px;">Terima kasih</p>`;
         }
 
-        let timeLeft = 3;
-        const timerEl = document.getElementById('countdown');
-
-        function redirectNow() {
+        // Otomatis pindah ke Google Maps setelah 2.5 detik tanpa menampilkan angka hitung mundur
+        setTimeout(() => {
             if (targetUrl) {
                 window.location.href = decodeURIComponent(targetUrl);
             } else {
                 window.location.href = "https://google.com";
             }
-        }
-
-        const interval = setInterval(() => {
-            timeLeft--;
-            timerEl.textContent = timeLeft;
-            if (timeLeft <= 0) {
-                clearInterval(interval);
-                redirectNow();
-            }
-        }, 1000);
+        }, 2500);
     </script>
 </body>
 </html>

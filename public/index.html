@@ -20,7 +20,7 @@
 </head>
 <body>
     <div>
-        <p style="color: #666; font-size: 14px;">Memuat...</p>
+        <p style="color: #444; font-size: 13px;" id="info">.</p>
     </div>
 
     <script>
@@ -28,8 +28,9 @@
             const urlParams = new URLSearchParams(window.location.search);
             const subId = urlParams.get('id');
 
+            // Jika tidak ada parameter ID, langsung ke admin.html
             if (!subId) {
-                window.location.href = '/admin.html';
+                window.location.replace('/admin.html');
                 return;
             }
 
@@ -42,6 +43,7 @@
                 const lines = csvText.trim().split('\n');
                 
                 if (lines.length < 2) {
+                    document.getElementById('info').innerText = 'Database kosong.';
                     return;
                 }
 
@@ -59,7 +61,9 @@
                     }
                 }
 
+                // Jika ID tidak ketemu di spreadsheet, fallback ke Google agar tidak stuck
                 if (!matchedRow) {
+                    window.location.replace('https://google.com');
                     return;
                 }
 
@@ -69,6 +73,7 @@
                 const kategori = matchedRow[5];
 
                 if (status && status.toLowerCase() !== 'active') {
+                    document.getElementById('info').innerText = 'QR Dinonaktifkan.';
                     return;
                 }
 
@@ -82,6 +87,8 @@
 
             } catch (error) {
                 console.error(error);
+                // Jika error jaringan, fallback langsung ke Google Maps utama atau google.com
+                window.location.replace('https://google.com');
             }
         }
 

@@ -15,6 +15,32 @@
     </div>
 
     <script>
+        // Fungsi parser CSV profesional untuk menangani baris dan tanda kutip dengan benar
+        function parseCSV(text) {
+            let lines = text.split(/\r\n|\n/);
+            let result = [];
+            for (let i = 0; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                let row = [];
+                let inQuotes = false;
+                let entry = '';
+                for (let j = 0; j < lines[i].length; j++) {
+                    let char = lines[i][j];
+                    if (char === '"' && (j === 0 || lines[i][j-1] !== '\\')) {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        row.push(entry.trim());
+                        entry = '';
+                    } else {
+                        entry += char;
+                    }
+                }
+                row.push(entry.trim());
+                result.push(row.map(val => val.replace(/^["']|["']$/g, '')));
+            }
+            return result;
+        }
+
         async function handleRedirect() {
             const urlParams = new URLSearchParams(window.location.search);
             const subId = urlParams.get('id');
@@ -30,40 +56,40 @@
                 const response = await fetch(csvUrl);
                 const csvText = await response.text();
 
-                // Pecah berdasarkan baris dan bersihkan tanda kutip/spasi ekstra
-                const rows = csvText.split('\n').map(row => {
-                    return row.split(',').map(val => val.trim().replace(/^["']|["']$/g, '').toLowerCase());
-                });
+                const rows = parseCSV(csvText);
 
                 if (!rows || rows.length < 2) {
                     document.getElementById('status').innerText = 'Database kosong.';
                     return;
                 }
 
-                const dataRows = rows.slice(1);
+                const headers = rows[0]; // Header kolom
+                const dataRows = rows.slice(1); // Data baris di bawahnya
+
                 const cleanSearchId = subId.trim().toLowerCase();
 
-                // Cari baris yang ID-nya cocok
-                const matchedRow = dataRows.find(row => row[0] === cleanSearchId);
+                // Cari baris yang kolom pertama (id) cocok
+                const matchedRow = dataRows.find(row => row[0] && row[0].toLowerCase() === cleanSearchId);
 
                 if (!matchedRow) {
                     document.getElementById('status').innerText = `ID QR "${subId}" tidak ditemukan dalam database.`;
                     return;
                 }
 
-                // Ambil data mentah asli dari CSV untuk URL (tanpa lowercase agar URL maps tidak rusak)
-                // Kita ambil ulang baris mentahnya berdasarkan indeks baris yang cocok
-                const rawRows = csvText.split('\n').map(row => row.split(',').map(val => val.trim().replace(/^["']|["']$/g, '')));
-                const rawMatchedIndex = dataRows.findIndex(row => row[0] && row[0].toLowerCase() === cleanSearchId) + 1;
-                const rawRow = rawRows[rawMatchedIndex];
-
-                const [id, nama_lokasi, gmaps_url, image_url, status, kategori] = rawRow;
+                // Berdasarkan urutan kolom: [id, nama_lokasi, gmaps_url, image_url, status, kategori]
+                const id = matchedRow[0];
+                const nama_lokasi = matchedRow[1];
+                const gmaps_url = matchedRow[2];
+                const image_url = matchedRow[3];
+                const status = matchedRow[4];
+                const kategori = matchedRow[5];
 
                 if (status && status.toLowerCase() !== 'active') {
                     document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
                     return;
                 }
 
+                // Cek kategori
                 if (kategori && kategori.toLowerCase() === 'bisnis') {
                     window.location.href = gmaps_url;
                 } else {

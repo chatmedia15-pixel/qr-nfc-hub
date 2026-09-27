@@ -19,22 +19,20 @@
             const urlParams = new URLSearchParams(window.location.search);
             const subId = urlParams.get('id');
 
-            // Jika tidak ada parameter id, arahkan ke halaman admin
             if (!subId) {
                 window.location.href = '/admin.html';
                 return;
             }
 
             try {
-                // Link CSV publik dari Google Sheets Anda
                 const csvUrl = 'https://docs.google.com/spreadsheets/d/1EVqMj-V9Y6r0fclk7tYVQB8Co9fQ1JEmsAhcTXXGVM/export?format=csv';
                 
                 const response = await fetch(csvUrl);
                 const csvText = await response.text();
 
-                // Parse CSV sederhana
+                // Pecah berdasarkan baris dan bersihkan tanda kutip/spasi ekstra
                 const rows = csvText.split('\n').map(row => {
-                    return row.split(',').map(val => val.trim().replace(/^["']|["']$/g, ''));
+                    return row.split(',').map(val => val.trim().replace(/^["']|["']$/g, '').toLowerCase());
                 });
 
                 if (!rows || rows.length < 2) {
@@ -43,26 +41,32 @@
                 }
 
                 const dataRows = rows.slice(1);
-                // Kolom ke-0 adalah id
-                const matchedRow = dataRows.find(row => row[0] && row[0].toLowerCase() === subId.toLowerCase());
+                const cleanSearchId = subId.trim().toLowerCase();
+
+                // Cari baris yang ID-nya cocok
+                const matchedRow = dataRows.find(row => row[0] === cleanSearchId);
 
                 if (!matchedRow) {
-                    document.getElementById('status').innerText = `ID QR "${subId}" tidak ditemukan.`;
+                    document.getElementById('status').innerText = `ID QR "${subId}" tidak ditemukan dalam database.`;
                     return;
                 }
 
-                const [id, nama_lokasi, gmaps_url, image_url, status, kategori] = matchedRow;
+                // Ambil data mentah asli dari CSV untuk URL (tanpa lowercase agar URL maps tidak rusak)
+                // Kita ambil ulang baris mentahnya berdasarkan indeks baris yang cocok
+                const rawRows = csvText.split('\n').map(row => row.split(',').map(val => val.trim().replace(/^["']|["']$/g, '')));
+                const rawMatchedIndex = dataRows.findIndex(row => row[0] && row[0].toLowerCase() === cleanSearchId) + 1;
+                const rawRow = rawRows[rawMatchedIndex];
+
+                const [id, nama_lokasi, gmaps_url, image_url, status, kategori] = rawRow;
 
                 if (status && status.toLowerCase() !== 'active') {
                     document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
                     return;
                 }
 
-                // Jika kategori bisnis, langsung ke Google Maps
                 if (kategori && kategori.toLowerCase() === 'bisnis') {
                     window.location.href = gmaps_url;
                 } else {
-                    // Jika non-bisnis, lempar ke halaman sponsor dengan membawa data
                     const encodedTarget = encodeURIComponent(gmaps_url);
                     const encodedImage = encodeURIComponent(image_url || '');
                     window.location.href = `/sponsor.html?target=${encodedTarget}&img=${encodedImage}`;

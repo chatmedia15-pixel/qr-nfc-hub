@@ -1,8 +1,3 @@
-const { google } = require('googleapis');
-
-// Ganti dengan Spreadsheet ID Anda
-const SPREADSHEET_ID = '1EVqMj-V9Y6r0fclkk7tyVQB8Co9fQ1JEmsAhcTXXGVM'; 
-
 export default async function handler(req, res) {
   const host = req.headers['x-forwarded-host'] || req.headers['host'] || '';
   const subId = host.split('.')[0];
@@ -12,35 +7,32 @@ export default async function handler(req, res) {
   }
 
   try {
-    const auth = new google.auth.GoogleAuth({
-      credentials: {
-        client_email: process.env.GOOGLE_CLIENT_EMAIL,
-        private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      },
-      scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+    // URL CSV Publik dari Google Sheets Anda
+    const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQty5Cfk38iLp1fHwLWMUk9Leri1EJcppHrfRmhCvxtWbysft4jMvaVhOB4K_YxZV3zDKBI6_7pqlcZ/pub?gid=0&single=true&output=csv';
+
+    const response = await fetch(csvUrl);
+    const csvText = await response.text();
+
+    // Parse CSV sederhana baris per baris
+    const rows = csvText.split('\n').map(row => {
+      // Mengatasi koma di dalam teks jika ada
+      return row.split(',').map(val => val.trim().replace(/^["']|["']$/g, ''));
     });
 
-    const sheets = google.sheets({ version: 'v4', auth });
-    
-    // Membaca kolom A sampai F sesuai struktur Google Sheets Anda
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: 'Sheet1!A:F',
-    });
-
-    const rows = response.data.values;
     if (!rows || rows.length < 2) {
-      return res.status(404).send('Database spreadsheet kosong.');
+      return res.status(404).send('Database CSV kosong.');
     }
 
+    const headers = rows[0]; // ['id', 'nama_lokasi', 'gmaps_url', 'image_url', 'status', 'kategori']
     const dataRows = rows.slice(1);
-    const matchedRow = dataRows.find(row => row[0] && row[0].trim().toLowerCase() === subId.toLowerCase());
+
+    // Cari baris yang kolom 'id'-nya cocok dengan subdomain
+    const matchedRow = dataRows.find(row => row[0] && row[0].toLowerCase() === subId.toLowerCase());
 
     if (!matchedRow) {
       return res.status(404).send(`ID QR / Subdomain "${subId}" tidak ditemukan.`);
     }
 
-    // Urutan kolom: [id, nama_lokasi, gmaps_url, image_url, status, kategori]
     const [id, nama_lokasi, gmaps_url, image_url, status, kategori] = matchedRow;
 
     if (status && status.toLowerCase() !== 'active') {
@@ -59,6 +51,6 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error(error);
-    return res.status(500).send('Terjadi kesalahan server saat membaca database.');
+    return res.status(500).send('Terjadi kesalahan saat membaca data CSV.');
   }
 }

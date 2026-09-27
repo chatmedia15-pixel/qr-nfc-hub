@@ -3,6 +3,5 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "googleapis": "^128.0.0"
   }
 }

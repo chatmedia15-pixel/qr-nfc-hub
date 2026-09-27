@@ -74,13 +74,13 @@
                     return;
                 }
 
-                    const gmaps_url = matchedRow[2];
+                const gmaps_url = matchedRow[2];
                 const image_url = matchedRow[3];
                 const status = matchedRow[4];
                 const kategori = matchedRow[5];
 
                 if (status && status.toLowerCase() !== 'active') {
-                    document.getElementById('status'].innerText = 'QR Code ini sedang dinonaktifkan.';
+                    document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
                     return;
                 }
 

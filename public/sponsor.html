@@ -16,8 +16,8 @@
             background: #000000; 
             color: #ffffff;
             text-align: center; 
-            /* Efek disolve: mengatur transisi pudar ke seluruh body */
-            opacity: 1;
+            /* Efek disolve awal masuk */
+            opacity: 0;
             transition: opacity 0.6s ease-in-out;
         }
         .container { 
@@ -48,6 +48,11 @@
     </div>
 
     <script>
+        // Efek fade-in saat halaman sponsor pertama kali terbuka
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.style.opacity = 1;
+        });
+
         const params = new URLSearchParams(window.location.search);
         const targetUrl = params.get('target');
         const imageUrl = params.get('img');
@@ -77,12 +82,12 @@
             bannerContainer.innerHTML = `<p style="color:#666; font-size:13px;">Terima kasih</p>`;
         }
 
-        // Timer untuk memicu efek disolve sebelum pindah halaman
+        // Timer untuk memicu efek disolve keluar menuju Google Maps
         setTimeout(() => {
-            // Ubah opacity menjadi 0 (memudar gelap perlahan)
+            // Layar perlahan memudar menjadi hitam pekat
             document.body.style.opacity = 0;
 
-            // Tunggu animasi fade selesai (0.6 detik) baru pindah ke Google Maps
+            // Setelah animasi fade-out selesai (0.6 detik), pindah ke Google Maps
             setTimeout(() => {
                 if (targetUrl) {
                     window.location.href = decodeURIComponent(targetUrl);
@@ -91,7 +96,7 @@
                 }
             }, 600);
 
-        }, 2500); // Durasi sponsor tampil (2.5 detik)
+        }, 2500); // Durasi sponsor tampil di layar
     </script>
 </body>
 </html>

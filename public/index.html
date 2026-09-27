@@ -5,13 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memuat...</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f9f9f9; color: #555; text-align: center; }
+        /* Mengubah total latar belakang menjadi hitam pekat agar selaras */
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+            background: #000000; 
+            color: #ffffff; 
+            text-align: center; 
+        }
     </style>
 </head>
 <body>
     <div>
-        <h3>Sedang memuat tujuan...</h3>
-        <p id="status">Mohon tunggu sebentar.</p>
+        <!-- Teks dibuat sangat minimalis atau transparan agar transisi mulus -->
+        <p style="color: #333; font-size: 13px;" id="status">.</p>
     </div>
 
     <script>
@@ -33,7 +44,7 @@
                 const lines = csvText.trim().split('\n');
                 
                 if (lines.length < 2) {
-                    document.getElementById('status').innerText = 'Database CSV kosong atau tidak terbaca.';
+                    document.getElementById('status').innerText = 'Database kosong.';
                     return;
                 }
 
@@ -43,7 +54,7 @@
                     if (!line) continue;
                     
                     const cols = line.split(',').map(val => val.trim().replace(/^["']|["']$/g, ''));
-                    const rowId = cols[0]; // Kolom id
+                    const rowId = cols[0];
 
                     if (rowId && rowId.toLowerCase() === subId.trim().toLowerCase()) {
                         matchedRow = cols;
@@ -52,7 +63,7 @@
                 }
 
                 if (!matchedRow) {
-                    document.getElementById('status').innerText = `ID QR "${subId}" tidak ditemukan dalam database.`;
+                    document.getElementById('status').innerText = `ID "${subId}" tidak ditemukan.`;
                     return;
                 }
 
@@ -62,21 +73,21 @@
                 const kategori = matchedRow[5];
 
                 if (status && status.toLowerCase() !== 'active') {
-                    document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
+                    document.getElementById('status').innerText = 'Dinonaktifkan.';
                     return;
                 }
 
                 if (kategori && kategori.toLowerCase() === 'bisnis') {
-                    window.location.href = gmaps_url;
+                    window.location.replace(gmaps_url);
                 } else {
                     const encodedTarget = encodeURIComponent(gmaps_url);
                     const encodedImage = encodeURIComponent(image_url || '');
-                    window.location.href = `/sponsor.html?target=${encodedTarget}&img=${encodedImage}`;
+                    window.location.replace(`/sponsor.html?target=${encodedTarget}&img=${encodedImage}`);
                 }
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('status').innerText = 'Terjadi kesalahan saat memuat data.';
+                document.getElementById('status').innerText = 'Kesalahan jaringan.';
             }
         }
 

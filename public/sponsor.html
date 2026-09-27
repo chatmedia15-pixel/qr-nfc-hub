@@ -16,6 +16,9 @@
             background: #000000; 
             color: #ffffff;
             text-align: center; 
+            /* Efek disolve: mengatur transisi pudar ke seluruh body */
+            opacity: 1;
+            transition: opacity 0.6s ease-in-out;
         }
         .container { 
             display: flex;
@@ -74,14 +77,21 @@
             bannerContainer.innerHTML = `<p style="color:#666; font-size:13px;">Terima kasih</p>`;
         }
 
-        // Otomatis pindah ke Google Maps setelah 2.5 detik tanpa menampilkan angka hitung mundur
+        // Timer untuk memicu efek disolve sebelum pindah halaman
         setTimeout(() => {
-            if (targetUrl) {
-                window.location.href = decodeURIComponent(targetUrl);
-            } else {
-                window.location.href = "https://google.com";
-            }
-        }, 2500);
+            // Ubah opacity menjadi 0 (memudar gelap perlahan)
+            document.body.style.opacity = 0;
+
+            // Tunggu animasi fade selesai (0.6 detik) baru pindah ke Google Maps
+            setTimeout(() => {
+                if (targetUrl) {
+                    window.location.href = decodeURIComponent(targetUrl);
+                } else {
+                    window.location.href = "https://google.com";
+                }
+            }, 600);
+
+        }, 2500); // Durasi sponsor tampil (2.5 detik)
     </script>
 </body>
 </html>

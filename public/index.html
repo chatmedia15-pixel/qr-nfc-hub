@@ -20,7 +20,7 @@
 </head>
 <body>
     <div>
-        <p style="color: #444; font-size: 13px;" id="info">.</p>
+        <p style="color: #888; font-size: 14px;" id="status">Memuat...</p>
     </div>
 
     <script>
@@ -28,7 +28,6 @@
             const urlParams = new URLSearchParams(window.location.search);
             const subId = urlParams.get('id');
 
-            // Jika tidak ada parameter ID, langsung ke admin.html
             if (!subId) {
                 window.location.replace('/admin.html');
                 return;
@@ -43,27 +42,29 @@
                 const lines = csvText.trim().split('\n');
                 
                 if (lines.length < 2) {
-                    document.getElementById('info').innerText = 'Database kosong.';
+                    document.getElementById('status').innerText = 'Database CSV kosong.';
                     return;
                 }
 
                 let matchedRow = null;
+                const cleanSearchId = subId.trim().toLowerCase();
+
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
                     
+                    // Pisahkan kolom dan bersihkan tanda kutip/spasi
                     const cols = line.split(',').map(val => val.trim().replace(/^["']|["']$/g, ''));
-                    const rowId = cols[0];
+                    const rowId = cols[0] ? cols[0].toLowerCase() : '';
 
-                    if (rowId && rowId.toLowerCase() === subId.trim().toLowerCase()) {
+                    if (rowId === cleanSearchId) {
                         matchedRow = cols;
                         break;
                     }
                 }
 
-                // Jika ID tidak ketemu di spreadsheet, fallback ke Google agar tidak stuck
                 if (!matchedRow) {
-                    window.location.replace('https://google.com');
+                    document.getElementById('status').innerText = `ID QR "${subId}" tidak ditemukan dalam database.`;
                     return;
                 }
 
@@ -73,7 +74,7 @@
                 const kategori = matchedRow[5];
 
                 if (status && status.toLowerCase() !== 'active') {
-                    document.getElementById('info').innerText = 'QR Dinonaktifkan.';
+                    document.getElementById('status').innerText = 'QR Code dinonaktifkan.';
                     return;
                 }
 
@@ -87,8 +88,7 @@
 
             } catch (error) {
                 console.error(error);
-                // Jika error jaringan, fallback langsung ke Google Maps utama atau google.com
-                window.location.replace('https://google.com');
+                document.getElementById('status').innerText = 'Gagal memuat data dari spreadsheet.';
             }
         }
 

@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memuat...</title>
     
-    <!-- Skrip Analitik Vercel untuk memantau kunjungan umum -->
-    <script defer src="/_vercel/insights/script.js"></script>
+    <!-- Google tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-V9L276726D"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-V9L276726D');
+    </script>
 
     <style>
         body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #000000; color: #888; text-align: center; }
@@ -28,8 +35,14 @@
                 return;
             }
 
+            // Kirim Custom Event ke Google Analytics untuk mencatat ID yang di-scan
+            if (typeof gtag === 'function') {
+                gtag('event', 'qr_scan_id', {
+                    'qr_id': subId.toLowerCase()
+                });
+            }
+
             try {
-                // Menggunakan kembali link CSV Google Sheets yang stabil
                 const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQty5Cfk38iLp1fHwLWMUk9Leri1EJcppHrfRmhCvxtWbysft4jMvaVhOB4K_YxZV3zDKBI6_7pqlcZ/pub?gid=0&single=true&output=csv';
                 
                 const response = await fetch(csvUrl);
@@ -61,13 +74,13 @@
                     return;
                 }
 
-                const gmaps_url = matchedRow[2];
+                    const gmaps_url = matchedRow[2];
                 const image_url = matchedRow[3];
                 const status = matchedRow[4];
                 const kategori = matchedRow[5];
 
                 if (status && status.toLowerCase() !== 'active') {
-                    document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
+                    document.getElementById('status'].innerText = 'QR Code ini sedang dinonaktifkan.';
                     return;
                 }
 

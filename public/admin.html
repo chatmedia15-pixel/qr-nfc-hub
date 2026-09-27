@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - QR Hub</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; background: #f9f9f9; color: #333; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); max-width: 600px; margin: auto; }
+        h2 { color: #0070f3; }
+        code { background: #eee; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Dashboard Admin QR & NFC Hub</h2>
+        <p>Sistem pengalihan dinamis Anda terhubung ke Google Sheets.</p>
+        <p>Edit spreadsheet Anda untuk mengubah data secara *real-time* berdasarkan kolom:</p>
+        <ul>
+            <li><b>id</b>: Subdomain unik (Contoh: <code>maps1</code> atau <code>maps2</code>)</li>
+            <li><b>nama_lokasi</b>: Nama tempat</li>
+            <li><b>gmaps_url</b>: Link Google Maps Review</li>
+            <li><b>image_url</b>: Link banner sponsor (untuk non-bisnis)</li>
+            <li><b>status</b>: <code>active</code></li>
+            <li><b>kategori</b>: <code>bisnis</code> (langsung maps) atau <code>non-bisnis</code> (pakai jeda sponsor 3 detik)</li>
+        </ul>
+    </div>
+</body>
+</html>

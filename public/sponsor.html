@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sponsor - Menuju Google Maps</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; background: #f4f7f6; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 350px; width: 100%; }
+        img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px; }
+        .timer { font-size: 28px; font-weight: bold; color: #ff5722; margin: 15px 0; }
+        button { background: #0070f3; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h3>Informasi Sponsor</h3>
+        <div id="banner-container"></div>
+        <p>Menuju Google Maps dalam...</p>
+        <div class="timer" id="countdown">3</div>
+        <button onclick="redirectNow()">Lewati Sekarang</button>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const targetUrl = params.get('target');
+        const imageUrl = params.get('img');
+
+        if (imageUrl) {
+            document.getElementById('banner-container').innerHTML = `<img src="${decodeURIComponent(imageUrl)}" alt="Sponsor">`;
+        }
+
+        let timeLeft = 3;
+        const timerEl = document.getElementById('countdown');
+
+        function redirectNow() {
+            if (targetUrl) {
+                window.location.href = decodeURIComponent(targetUrl);
+            } else {
+                window.location.href = "https://google.com";
+            }
+        }
+
+        const interval = setInterval(() => {
+            timeLeft--;
+            timerEl.textContent = timeLeft;
+            if (timeLeft <= 0) {
+                clearInterval(interval);
+                redirectNow();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

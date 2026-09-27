@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memuat...</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f9f9f9; color: #555; text-align: center; }
+    </style>
+</head>
+<body>
+    <div>
+        <h3>Sedang memuat tujuan...</h3>
+        <p id="status">Mohon tunggu sebentar.</p>
+    </div>
+
+    <script>
+        async function handleRedirect() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const subId = urlParams.get('id');
+
+            // Jika tidak ada parameter id, arahkan ke halaman admin
+            if (!subId) {
+                window.location.href = '/admin.html';
+                return;
+            }
+
+            try {
+                // Link CSV publik dari Google Sheets Anda
+                const csvUrl = 'https://docs.google.com/spreadsheets/d/1EVqMj-V9Y6r0fclk7tYVQB8Co9fQ1JEmsAhcTXXGVM/export?format=csv';
+                
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+
+                // Parse CSV sederhana
+                const rows = csvText.split('\n').map(row => {
+                    return row.split(',').map(val => val.trim().replace(/^["']|["']$/g, ''));
+                });
+
+                if (!rows || rows.length < 2) {
+                    document.getElementById('status').innerText = 'Database kosong.';
+                    return;
+                }
+
+                const dataRows = rows.slice(1);
+                // Kolom ke-0 adalah id
+                const matchedRow = dataRows.find(row => row[0] && row[0].toLowerCase() === subId.toLowerCase());
+
+                if (!matchedRow) {
+                    document.getElementById('status').innerText = `ID QR "${subId}" tidak ditemukan.`;
+                    return;
+                }
+
+                const [id, nama_lokasi, gmaps_url, image_url, status, kategori] = matchedRow;
+
+                if (status && status.toLowerCase() !== 'active') {
+                    document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
+                    return;
+                }
+
+                // Jika kategori bisnis, langsung ke Google Maps
+                if (kategori && kategori.toLowerCase() === 'bisnis') {
+                    window.location.href = gmaps_url;
+                } else {
+                    // Jika non-bisnis, lempar ke halaman sponsor dengan membawa data
+                    const encodedTarget = encodeURIComponent(gmaps_url);
+                    const encodedImage = encodeURIComponent(image_url || '');
+                    window.location.href = `/sponsor.html?target=${encodedTarget}&img=${encodedImage}`;
+                }
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('status').innerText = 'Terjadi kesalahan saat memuat data.';
+            }
+        }
+
+        handleRedirect();
+    </script>
+</body>
+</html>

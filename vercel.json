@@ -1,7 +1,5 @@
 {
-  "routes": [
-    { "src": "/admin", "dest": "/admin.html" },
-    { "src": "/sponsor", "dest": "/sponsor.html" },
-    { "src": "/(.*)", "dest": "/api/redirect" }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

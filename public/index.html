@@ -5,22 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Memuat...</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-            background: #000000; 
-            color: #ffffff; 
-            text-align: center; 
-        }
+        /* Tetap pertahankan background hitam sesuai keinginan Anda */
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #000000; color: #888; text-align: center; }
     </style>
 </head>
 <body>
     <div>
-        <p style="color: #888; font-size: 14px;" id="status">Memuat...</p>
+        <h3>Sedang memuat tujuan...</h3>
+        <p id="status">Mohon tunggu sebentar.</p>
     </div>
 
     <script>
@@ -29,11 +21,12 @@
             const subId = urlParams.get('id');
 
             if (!subId) {
-                window.location.replace('/admin.html');
+                window.location.href = '/admin.html';
                 return;
             }
 
             try {
+                // Link CSV publik dari Google Sheets Anda yang sudah terbukti lancar
                 const csvUrl = 'https://docs.google.com/spreadsheets/d/1EVqMj-V9Y6r0fclk7tYVQB8Co9fQ1JEmsAhcTXXGVM/export?format=csv';
                 
                 const response = await fetch(csvUrl);
@@ -42,22 +35,19 @@
                 const lines = csvText.trim().split('\n');
                 
                 if (lines.length < 2) {
-                    document.getElementById('status').innerText = 'Database CSV kosong.';
+                    document.getElementById('status').innerText = 'Database CSV kosong atau tidak terbaca.';
                     return;
                 }
 
                 let matchedRow = null;
-                const cleanSearchId = subId.trim().toLowerCase();
-
                 for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
                     
-                    // Pisahkan kolom dan bersihkan tanda kutip/spasi
                     const cols = line.split(',').map(val => val.trim().replace(/^["']|["']$/g, ''));
-                    const rowId = cols[0] ? cols[0].toLowerCase() : '';
+                    const rowId = cols[0]; // Kolom id
 
-                    if (rowId === cleanSearchId) {
+                    if (rowId && rowId.toLowerCase() === subId.trim().toLowerCase()) {
                         matchedRow = cols;
                         break;
                     }
@@ -74,21 +64,21 @@
                 const kategori = matchedRow[5];
 
                 if (status && status.toLowerCase() !== 'active') {
-                    document.getElementById('status').innerText = 'QR Code dinonaktifkan.';
+                    document.getElementById('status').innerText = 'QR Code ini sedang dinonaktifkan.';
                     return;
                 }
 
                 if (kategori && kategori.toLowerCase() === 'bisnis') {
-                    window.location.replace(gmaps_url);
+                    window.location.href = gmaps_url;
                 } else {
                     const encodedTarget = encodeURIComponent(gmaps_url);
                     const encodedImage = encodeURIComponent(image_url || '');
-                    window.location.replace(`/sponsor.html?target=${encodedTarget}&img=${encodedImage}`);
+                    window.location.href = `/sponsor.html?target=${encodedTarget}&img=${encodedImage}`;
                 }
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('status').innerText = 'Gagal memuat data dari spreadsheet.';
+                document.getElementById('status').innerText = 'Terjadi kesalahan saat memuat data.';
             }
         }
 
